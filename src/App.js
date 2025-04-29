@@ -1,9 +1,9 @@
+// App.js
 import { useState, useEffect } from "react";
 import { connectWallet, disconnectWallet, switchNetwork } from "./connectWallet";
 import { CHAINS } from "./chains";
 import MintNFT from "./MintNFT";
 import ListNFT from "./ListNFT";
-import ActiveListings from "./ActiveListings";
 import { Contract } from "ethers";
 import { MarketplaceAbi } from "./MarketplaceAbi";
 import "./App.css";
@@ -17,8 +17,9 @@ function App() {
   async function connect() {
     const wallet = await connectWallet();
     if (wallet) {
+      const address = await wallet.signer.getAddress();
       setSigner(wallet.signer);
-      setWalletAddress(wallet.signer.address);
+      setWalletAddress(address);
     }
   }
 
@@ -42,7 +43,6 @@ function App() {
   async function loadUserNFTs() {
     if (!signer) return;
     const contract = new Contract(CHAINS[selectedChain].contractAddress, MarketplaceAbi, signer);
-    // Placeholder: replace with real function call if supported
     const fakeNFTs = [
       { id: 0, name: "NFT #0" },
       { id: 1, name: "NFT #1" }
@@ -57,6 +57,15 @@ function App() {
   return (
     <div className="container">
       <div className="left-panel">
+        <MintNFT signer={signer} />
+        <ListNFT signer={signer} />
+      </div>
+
+      <div className="center-panel">
+        <div className="coming-soon">Coming Soon</div>
+      </div>
+
+      <div className="right-panel">
         <div className="wallet-bar">
           {!signer ? (
             <button className="wallet-button" onClick={connect}>Connect Wallet</button>
@@ -83,15 +92,6 @@ function App() {
             ))}
           </div>
         </div>
-      </div>
-
-      <div className="main-panel">
-        <MintNFT signer={signer} />
-        <ListNFT signer={signer} />
-      </div>
-
-      <div className="right-panel">
-        <ActiveListings />
       </div>
     </div>
   );

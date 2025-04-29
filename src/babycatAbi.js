@@ -1,5 +1,5 @@
 // src/babycatAbi.js
-export const babycatAbi = [[
+export const babycatAbi = [
 	{
 		"inputs": [
 			{
@@ -596,4 +596,4 @@ export const babycatAbi = [[
 		"stateMutability": "view",
 		"type": "function"
 	}
-]];
+];
