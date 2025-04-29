@@ -1,44 +1,38 @@
-import { useState } from "react";
-import { ethers } from "ethers";
-import marketplaceAbi from "./MarketplaceABI.json";
+// src/MintNFT.js
+import { ethers, BrowserProvider, Contract } from "ethers";
+import { nfts } from "./nfts"; // file data NFT (bạn cần tạo)
 
-const CONTRACT_ADDRESS = "0x9a7dFc6E01968E83Af6C47fC6ebf88e1327f2dC2"; // thay bằng địa chỉ contract NFT bạn đã deploy
-
-function MintNFT({ signer }) {
-  const [loading, setLoading] = useState(false);
-
-  async function handleMint() {
-    if (!signer) {
-      alert("Connect wallet first!");
+function MintNFT() {
+  async function handleMint(nft) {
+    if (!window.ethereum) {
+      alert("Please install MetaMask or OKX Wallet!");
       return;
     }
 
+    const provider = new BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const contract = new Contract(nft.contract, nft.abi, signer);
+
     try {
-      setLoading(true);
-
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, marketplaceAbi, signer);
-
-      const tx = await contract.mint({
-        value: ethers.parseEther("0.01"), // Gửi đúng 0.01 MON
-      });
-
+      const tx = await contract.mint({ value: ethers.parseEther("0.01") });
       await tx.wait();
-
-      alert("Mint successful!");
+      alert(`Minted ${nft.name} successfully!`);
     } catch (error) {
       console.error("Mint failed:", error);
       alert("Mint failed!");
-    } finally {
-      setLoading(false);
     }
   }
 
   return (
-    <div className="card">
-      <h2>Mint NFT</h2>
-      <button className="primary-button" onClick={handleMint} disabled={loading}>
-        {loading ? "Minting..." : "Mint NFT"}
-      </button>
+    <div className="mint-grid">
+      {nfts.map((nft) => (
+        <div key={nft.name} className="mint-card">
+          <img src={nft.image} alt={nft.name} className="mint-image" />
+          <button onClick={() => handleMint(nft)} className="mint-button">
+            Mint
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

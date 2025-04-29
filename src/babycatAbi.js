@@ -1,4 +1,5 @@
-[
+// src/babycatAbi.js
+export const babycatAbi = [[
 	{
 		"inputs": [
 			{
@@ -595,4 +596,4 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]
+]];
