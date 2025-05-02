@@ -1,14 +1,14 @@
 import { BrowserProvider } from "ethers";
 
+// Kết nối mới (yêu cầu xác nhận ví)
 export async function connectWallet() {
-  if (typeof window.ethereum === "undefined") {
+  if (!window.ethereum) {
     alert("Please install MetaMask or OKX Wallet!");
     return null;
   }
 
   try {
     await window.ethereum.request({ method: "eth_requestAccounts" });
-
     const provider = new BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
     const network = await provider.getNetwork();
@@ -23,6 +23,24 @@ export async function connectWallet() {
     alert("Failed to connect wallet!");
     return null;
   }
+}
+
+// ✅ Hàm reconnect không hiện popup
+export async function getExistingWallet() {
+  if (!window.ethereum) return null;
+
+  const accounts = await window.ethereum.request({ method: "eth_accounts" });
+  if (accounts.length === 0) return null;
+
+  const provider = new BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+  const network = await provider.getNetwork();
+
+  return {
+    provider,
+    signer,
+    chainId: Number(network.chainId),
+  };
 }
 
 export async function switchNetwork(chainInfo) {
